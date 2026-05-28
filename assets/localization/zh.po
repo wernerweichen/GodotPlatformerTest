@@ -113,3 +113,16 @@ msgstr "返回"
 
 msgid "SCRAP_LABEL"
 msgstr "孢子晶"
+
+# ── Pickup Items ───────────────────────────────────────────────────────────
+msgid "ITEM_SPORE_CLUSTER"
+msgstr "孢子結晶"
+
+msgid "ITEM_VIAL_OF_ICHOR"
+msgstr "琥珀血清"
+
+msgid "ITEM_IRON_SHARD"
+msgstr "鐵礦碎片"
+
+msgid "PICKUP_PREFIX"
+msgstr "已拾取："

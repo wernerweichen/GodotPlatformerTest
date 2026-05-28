@@ -122,3 +122,16 @@ msgstr ""
 
 msgid "SCRAP_LABEL"
 msgstr ""
+
+# ── Pickup Items ───────────────────────────────────────────────────────────
+msgid "ITEM_SPORE_CLUSTER"
+msgstr ""
+
+msgid "ITEM_VIAL_OF_ICHOR"
+msgstr ""
+
+msgid "ITEM_IRON_SHARD"
+msgstr ""
+
+msgid "PICKUP_PREFIX"
+msgstr ""

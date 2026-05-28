@@ -113,3 +113,16 @@ msgstr "Back"
 
 msgid "SCRAP_LABEL"
 msgstr "Spores"
+
+# ── Pickup Items ───────────────────────────────────────────────────────────
+msgid "ITEM_SPORE_CLUSTER"
+msgstr "Crystallised Spore Cluster"
+
+msgid "ITEM_VIAL_OF_ICHOR"
+msgstr "Vial of Ichor"
+
+msgid "ITEM_IRON_SHARD"
+msgstr "Iron Shard"
+
+msgid "PICKUP_PREFIX"
+msgstr "Found:"

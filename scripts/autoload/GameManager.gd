@@ -8,6 +8,7 @@ signal game_loaded
 signal petal_collected(total: int)
 signal scrap_changed(total: int)
 signal health_changed(current: int, maximum: int)
+signal item_picked_up(item_data: ItemData)
 
 var current_zone: int = 1
 var current_room: String = "start"
@@ -20,6 +21,7 @@ var max_health: int = 5
 var current_health: int = 5
 var scrap_total: int = 0
 var petals_collected: Array[String] = []
+var inventory: Array[Dictionary] = []
 
 var _scrap_at_last_save: int = 0
 
@@ -40,6 +42,7 @@ func save_game() -> void:
 		"max_health": max_health,
 		"scrap_total": scrap_total,
 		"petals_collected": petals_collected,
+		"inventory": inventory,
 		"language": LocalizationManager.get_language(),
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -69,6 +72,7 @@ func load_game() -> void:
 	scrap_total = data.get("scrap_total", 0)
 	_scrap_at_last_save = scrap_total
 	petals_collected = Array(data.get("petals_collected", []), TYPE_STRING, "", null)
+	inventory = Array(data.get("inventory", []), TYPE_DICTIONARY, "", null)
 	var lang: String = data.get("language", "en")
 	LocalizationManager.set_language(lang)
 	game_loaded.emit()
@@ -117,3 +121,13 @@ func upgrade_max_health(amount: int = 1) -> void:
 
 func is_true_ending_unlocked() -> bool:
 	return petals_collected.size() >= TRUE_ENDING_PETAL_COUNT
+
+# Adds an item to the inventory and notifies listeners via item_picked_up signal.
+func add_item(item_data: ItemData) -> void:
+	var entry: Dictionary = {
+		"type": item_data.item_type,
+		"name_key": item_data.item_name_key,
+		"value": item_data.item_value,
+	}
+	inventory.append(entry)
+	item_picked_up.emit(item_data)

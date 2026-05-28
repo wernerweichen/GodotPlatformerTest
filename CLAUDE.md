@@ -124,12 +124,14 @@ GodotPlatformerTest/
 │   │   └── zone_5_core/
 │   ├── ui/
 │   │   ├── HUD.tscn / HUD.gd
+│   │   ├── PickupPopup.tscn / PickupPopup.gd   # Pickup notification overlay
 │   │   ├── PauseMenu.tscn / PauseMenu.gd
 │   │   ├── MainMenu.tscn / MainMenu.gd
 │   │   └── LoreArchive.tscn / LoreArchive.gd
 │   └── shared/
 │       ├── SilentAltar.tscn / SilentAltar.gd   # Save point / respawn
 │       ├── BloodPetalFragment.tscn              # Collectible lore item
+│       ├── PickupItem.tscn / PickupItem.gd      # Generic world pickup item
 │       ├── Hazard.tscn
 │       └── Camera.tscn / Camera.gd
 ├── scripts/
@@ -140,11 +142,13 @@ GodotPlatformerTest/
 │   └── resources/
 │       ├── AbilityResource.gd        # Custom Resource for ability data
 │       ├── EnemyStats.gd             # Custom Resource for enemy stat sheets
+│       ├── ItemData.gd               # Custom Resource for pickup item data
 │       └── PetalMemory.gd            # Custom Resource for lore fragments
 └── tests/
     ├── test_runner.gd                # GUT test suite entry point
     ├── test_player_movement.gd
     ├── test_blood_cost.gd
+    ├── test_pickup_item.gd
     ├── test_save_system.gd
     └── test_localization.gd
 ```
@@ -215,9 +219,21 @@ All enemies extend this. It handles:
 
 - `FileAccess` → JSON → `user://save.json`
 - Save only at Silent Altars — never mid-room
-- Saved state: current zone/room ID, unlocked abilities (Array), max health, scrap total, petals collected (Array of IDs)
+- Saved state: current zone/room ID, unlocked abilities (Array), max health, scrap total, petals collected (Array of IDs), inventory (Array of Dicts)
 - On death: reload last save; scrap from current run is kept (by design)
 - Ending branch check: `petals_collected.size() >= 24` → True Ending; else Bad Ending
+
+### Pickup Item System (`scenes/shared/PickupItem.gd`)
+
+- `Area2D` — collision_layer 32, collision_mask 2 (detects player body)
+- On body_entered with player: calls `GameManager.add_item(item_data)`, plays `item_pickup` SFX, `queue_free()`
+- Hover animation via looping `Tween` (matches `BloodPetalFragment` style)
+- `@export var item_data: ItemData` — assign in Inspector; all tunable values are exports
+- `ItemData` resource: `item_type: String`, `item_name_key: String` (tr() key), `item_value: int`
+- Inventory stored in `GameManager.inventory: Array[Dictionary]` — persisted to save file
+- `GameManager.item_picked_up(item_data)` signal drives `PickupPopup` overlay (fade in → hold 2 s → fade out)
+- `PickupPopup` is instanced as a child of `HUD.tscn`; manages its own signal connection in `_ready()`
+- To place an item in the world: instance `PickupItem.tscn`, set `item_data` in Inspector, done
 
 ### Localization (`scripts/autoload/LocalizationManager.gd`)
 
@@ -233,6 +249,7 @@ All enemies extend this. It handles:
 - Health: instantiate spider lily heart icons from `PackedScene`
 - Petal counter: `tr("HUD_PETALS")` label + N/24 count; animates on pickup
 - Ability icon: swaps texture on ability change; dims on cooldown
+- `PickupPopup` child handles its own `item_picked_up` signal — no changes needed in `HUD.gd`
 
 ### Silent Altar (`scenes/shared/SilentAltar.gd`)
 
@@ -263,6 +280,7 @@ All enemies extend this. It handles:
 - **All audio via `AudioManager` autoload only** — never call `.play()` on an `AudioStreamPlayer` from game logic
 - API: `AudioManager.play_sfx("attack")`, `AudioManager.play_music("zone_1")`
 - Keys are lowercase snake_case strings matching filenames without extension
+- `item_pickup` SFX key expected at `assets/audio/sfx/item_pickup.wav`
 
 ---
 
@@ -352,6 +370,7 @@ get_node("../../UI/HUD")         # Bad
 - [x] **Zone 1 room** — `zone1_start.tscn` with platforms, entities, camera wired
 - [x] **Silent Altar** — save/load, respawn position, prompt label
 - [x] **Blood Petal Fragment** — `petal_01` placed in Zone 1, hover animation
+- [x] **Pickup item system** — `ItemData` resource, `PickupItem` world scene, `PickupPopup` HUD overlay, inventory in `GameManager`
 - [x] **HUD** — spider lily hearts (full/empty), petal counter, zone label, ability icon
 - [x] **Main Menu** — Play transitions to Zone 1
 - [x] **Pause Menu** — pause/resume, Lore Archive panel, Quit to Menu
@@ -390,8 +409,10 @@ Remaining steps require the Godot 4.4 editor:
 2. **Install GUT** via AssetLib tab (search "GUT") → enables `tests/` to compile
 3. **Add EnemyStats resource** to InfectedGuard and SentinelPrime nodes in Inspector
 4. **Wire placeholder sprites** — `zone1_start.gd` does this at runtime via `PlaceholderSpriteGenerator`
-5. **HTML5 export preset** — Project → Export → Add HTML5 preset → enable Cross-Origin Isolation → Export
-6. **GitHub Pages** — push `web/` output to `gh-pages` branch
+5. **Place a PickupItem** in Zone 1 — instance `PickupItem.tscn`, assign an `ItemData` resource in Inspector
+6. **Add `item_pickup.wav`** to `assets/audio/sfx/` — AudioManager will load it automatically
+7. **HTML5 export preset** — Project → Export → Add HTML5 preset → enable Cross-Origin Isolation → Export
+8. **GitHub Pages** — push `web/` output to `gh-pages` branch
 
 Next code milestone: **DashAbility component** (`scenes/player/abilities/DashAbility.gd` + `.tscn`).
 
@@ -399,7 +420,7 @@ Next code milestone: **DashAbility component** (`scenes/player/abilities/DashAbi
 
 ## Known Issues
 
-*(none yet — project not started)*
+*(none)*
 
 ---
 
@@ -415,3 +436,5 @@ Next code milestone: **DashAbility component** (`scenes/player/abilities/DashAbi
 - Blood Cost HP drain must be floored at 1 — enforce this in code, not just design intent
 - GUT must live in `addons/gut/` — do NOT vendor it inside `scripts/`
 - `AudioManager.play_sfx()` is the only legal way to trigger sound from game logic — no exceptions
+- `PickupItem` calls `AudioManager.play_sfx("item_pickup")` — add `assets/audio/sfx/item_pickup.wav` before testing audio
+- `PickupPopup` manages its own `item_picked_up` signal connection — it does not need to be wired in HUD.gd
