@@ -6,8 +6,7 @@ func _ready() -> void:
 	_refresh_labels()
 
 func _on_play_pressed() -> void:
-	# TODO: transition to Zone 1 start room
-	pass
+	get_tree().change_scene_to_file("res://scenes/zones/zone_1_barracks/rooms/zone1_start.tscn")
 
 func _on_options_pressed() -> void:
 	# TODO: show options panel

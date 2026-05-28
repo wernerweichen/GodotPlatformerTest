@@ -342,22 +342,22 @@ get_node("../../UI/HUD")         # Bad
 - [x] `AudioManager` autoload stub
 - [x] `GameManager` autoload — state, save/load, ending branch check
 - [x] Placeholder sprite generator utility (`scripts/utils/PlaceholderSpriteGenerator.gd`)
-- [ ] **Player controller** — movement, jump, coyote time, jump buffer, wall slide/jump
-- [ ] **Greatsword slash** — 3-hit chain
-- [ ] **Blood Cost mechanic** — charge, HP drain, projectile arc
-- [ ] **Camera** — lerp follow, look-ahead, room clamping, screen shake
-- [ ] **EnemyBase** class
-- [ ] **InfectedGuard** enemy (Zone 1 common)
-- [ ] **Sentinel-Prime** boss (teaches Blood Cost; grants Dash)
-- [ ] **Zone 1 tilemap** — TileMapLayer room structure
-- [ ] **Silent Altar** — save/load, respawn point
-- [ ] **Blood Petal Fragment** — one collectible placed in Zone 1
-- [ ] **HUD** — health hearts, petal counter, ability icon
-- [ ] **Main Menu**
-- [ ] **Pause Menu**
-- [ ] **GUT test suite** — movement, blood cost, save system, localization
-- [ ] **HTML5 export** — Cross-Origin Isolation enabled
-- [ ] **GitHub Pages deploy** — `gh-pages` branch live
+- [x] **Player controller** — movement, jump, coyote time, jump buffer, wall slide/jump
+- [x] **Greatsword slash** — 3-hit chain with combo window
+- [x] **Blood Cost mechanic** — charge, HP drain floor at 1, projectile arc
+- [x] **Camera** — lerp follow, look-ahead, room clamping, screen shake
+- [x] **EnemyBase** class — health, knockback, hit flash, death, scrap drop
+- [x] **InfectedGuard** enemy — patrol, wind-up (16f), attack, cooldown
+- [x] **Sentinel-Prime** boss — patrol/wind-up/attack/charge, Phase 2 Blood Cost shield, grants Dash
+- [x] **Zone 1 room** — `zone1_start.tscn` with platforms, entities, camera wired
+- [x] **Silent Altar** — save/load, respawn position, prompt label
+- [x] **Blood Petal Fragment** — `petal_01` placed in Zone 1, hover animation
+- [x] **HUD** — spider lily hearts (full/empty), petal counter, zone label, ability icon
+- [x] **Main Menu** — Play transitions to Zone 1
+- [x] **Pause Menu** — pause/resume, Lore Archive panel, Quit to Menu
+- [ ] **GUT test suite** — stubs exist; install GUT via AssetLib to activate
+- [ ] **HTML5 export** — enable Cross-Origin Isolation in export preset (editor step)
+- [ ] **GitHub Pages deploy** — `gh-pages` branch (run after first HTML5 export)
 
 ### Post-Vertical-Slice
 
@@ -382,17 +382,18 @@ get_node("../../UI/HUD")         # Bad
 
 ## Current Task
 
-**Step 2 — Player Controller**
+**Vertical Slice is feature-complete in code.**
 
-Scaffolding is complete. Build next:
-1. `scenes/player/Player.tscn` — `CharacterBody2D` with `CollisionShape2D` and `Sprite2D` (placeholder from `PlaceholderSpriteGenerator`)
-2. `scenes/player/Player.gd` — full state machine, movement, coyote time, jump buffer, wall slide/jump, greatsword slash, Blood Cost
-3. Wire `GameManager.take_damage()` to player hurt state
-4. Add `scenes/shared/Camera.tscn` with lerp follow + look-ahead
-5. Create a minimal test room to validate movement feel
+Remaining steps require the Godot 4.4 editor:
 
-**One-time setup required:**
-- Install GUT via the Godot editor's **AssetLib** tab (search "GUT") so test files compile
+1. **Open project** in Godot 4.4 — editor will import all assets and regenerate UIDs
+2. **Install GUT** via AssetLib tab (search "GUT") → enables `tests/` to compile
+3. **Add EnemyStats resource** to InfectedGuard and SentinelPrime nodes in Inspector
+4. **Wire placeholder sprites** — `zone1_start.gd` does this at runtime via `PlaceholderSpriteGenerator`
+5. **HTML5 export preset** — Project → Export → Add HTML5 preset → enable Cross-Origin Isolation → Export
+6. **GitHub Pages** — push `web/` output to `gh-pages` branch
+
+Next code milestone: **DashAbility component** (`scenes/player/abilities/DashAbility.gd` + `.tscn`).
 
 ---
 
