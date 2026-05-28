@@ -33,18 +33,14 @@ size = Vector2(320, 8)
 [node name="Zone1Start" type="Node2D"]
 script = ExtResource("8_room")
 
-[node name="HUD" type="Node" parent="."]
-instance = ExtResource("6_hud")
+[node name="HUD" parent="." instance=ExtResource("6_hud")]
 
-[node name="PauseMenu" type="Node" parent="."]
-instance = ExtResource("7_pause")
+[node name="PauseMenu" parent="." instance=ExtResource("7_pause")]
 
-[node name="Player" type="Node" parent="."]
-instance = ExtResource("1_player")
+[node name="Player" parent="." instance=ExtResource("1_player")]
 position = Vector2(40, 140)
 
-[node name="Camera" type="Node" parent="Player"]
-instance = ExtResource("2_cam")
+[node name="Camera" parent="Player" instance=ExtResource("2_cam")]
 
 [node name="Platforms" type="Node2D" parent="."]
 
@@ -127,14 +123,11 @@ color = Color(0.45, 0.47, 0.51, 1)
 
 [node name="Entities" type="Node2D" parent="."]
 
-[node name="InfectedGuard" type="Node" parent="Entities"]
-instance = ExtResource("3_guard")
+[node name="InfectedGuard" parent="Entities" instance=ExtResource("3_guard")]
 position = Vector2(180, 155)
 
-[node name="SilentAltar" type="Node" parent="Entities"]
-instance = ExtResource("4_altar")
+[node name="SilentAltar" parent="Entities" instance=ExtResource("4_altar")]
 position = Vector2(40, 156)
 
-[node name="BloodPetalFragment" type="Node" parent="Entities"]
-instance = ExtResource("5_petal")
+[node name="BloodPetalFragment" parent="Entities" instance=ExtResource("5_petal")]
 position = Vector2(270, 78)
