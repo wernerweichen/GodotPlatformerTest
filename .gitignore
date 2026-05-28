@@ -1,0 +1,15 @@
+# Godot 4 — standard ignores
+.godot/
+*.translation
+
+# Export output
+web/
+builds/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.tmp
+*.swp

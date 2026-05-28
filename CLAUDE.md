@@ -335,13 +335,13 @@ get_node("../../UI/HUD")         # Bad
 
 ### Vertical Slice (current milestone)
 
-- [ ] `project.godot` — name, resolution (320×180), integer scaling, autoloads, input map
-- [ ] Full folder structure created
-- [ ] GUT installed and configured (`addons/gut/`)
-- [ ] Localization skeleton — `.pot`, `en.po`, `zh.po`; `LocalizationManager` autoload
-- [ ] `AudioManager` autoload stub
-- [ ] `GameManager` autoload — state, save/load, ending branch check
-- [ ] Placeholder sprite generator utility
+- [x] `project.godot` — name, resolution (320×180), integer scaling, autoloads, input map
+- [x] Full folder structure created
+- [ ] GUT installed and configured (`addons/gut/`) — install via Godot AssetLib
+- [x] Localization skeleton — `.pot`, `en.po`, `zh.po`; `LocalizationManager` autoload
+- [x] `AudioManager` autoload stub
+- [x] `GameManager` autoload — state, save/load, ending branch check
+- [x] Placeholder sprite generator utility (`scripts/utils/PlaceholderSpriteGenerator.gd`)
 - [ ] **Player controller** — movement, jump, coyote time, jump buffer, wall slide/jump
 - [ ] **Greatsword slash** — 3-hit chain
 - [ ] **Blood Cost mechanic** — charge, HP drain, projectile arc
@@ -382,19 +382,17 @@ get_node("../../UI/HUD")         # Bad
 
 ## Current Task
 
-**Step 1 — Project Scaffolding**
+**Step 2 — Player Controller**
 
-In order:
-1. Create `project.godot` for Godot 4.4 with correct project name ("The Blood Bloom"), resolution (320×180), `canvas_items` stretch, integer scaling
-2. Create full folder structure (all dirs listed above)
-3. Configure input map actions in `project.godot`
-4. Scaffold `GameManager.gd`, `AudioManager.gd`, `LocalizationManager.gd` as autoloads
-5. Create localization skeleton: `blood_bloom.pot`, `en.po`, `zh.po` with stub keys
-6. Install GUT — copy addon or add to `.gitmodules`
-7. Write `tests/test_runner.gd` stub
-8. Generate placeholder sprite utility script
+Scaffolding is complete. Build next:
+1. `scenes/player/Player.tscn` — `CharacterBody2D` with `CollisionShape2D` and `Sprite2D` (placeholder from `PlaceholderSpriteGenerator`)
+2. `scenes/player/Player.gd` — full state machine, movement, coyote time, jump buffer, wall slide/jump, greatsword slash, Blood Cost
+3. Wire `GameManager.take_damage()` to player hurt state
+4. Add `scenes/shared/Camera.tscn` with lerp follow + look-ahead
+5. Create a minimal test room to validate movement feel
 
-**Next after scaffolding:** Player controller.
+**One-time setup required:**
+- Install GUT via the Godot editor's **AssetLib** tab (search "GUT") so test files compile
 
 ---
 

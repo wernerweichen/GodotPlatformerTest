@@ -1,0 +1,50 @@
+[gd_scene load_steps=2 format=3 uid="uid://bm4x7q2n8r5t"]
+
+[ext_resource type="Script" path="res://scenes/ui/MainMenu.gd" id="1_a1b2c"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_a1b2c")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.071, 0.02, 0.031, 1)
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = -40.0
+offset_right = 60.0
+offset_bottom = 40.0
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="VBox"]
+layout_mode = 2
+text = "The Blood Bloom"
+horizontal_alignment = 1
+
+[node name="PlayButton" type="Button" parent="VBox"]
+layout_mode = 2
+text = &"MENU_PLAY"
+
+[node name="OptionsButton" type="Button" parent="VBox"]
+layout_mode = 2
+text = &"MENU_OPTIONS"
+
+[node name="QuitButton" type="Button" parent="VBox"]
+layout_mode = 2
+text = &"MENU_QUIT"
+
+[connection signal="pressed" from="VBox/PlayButton" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="VBox/OptionsButton" to="." method="_on_options_pressed"]
+[connection signal="pressed" from="VBox/QuitButton" to="." method="_on_quit_pressed"]

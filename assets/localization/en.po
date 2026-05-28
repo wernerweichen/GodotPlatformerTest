@@ -1,0 +1,115 @@
+# English — The Blood Bloom
+#
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+
+msgid "MENU_PLAY"
+msgstr "Play"
+
+msgid "MENU_OPTIONS"
+msgstr "Options"
+
+msgid "MENU_QUIT"
+msgstr "Quit"
+
+msgid "MENU_TITLE"
+msgstr "The Blood Bloom"
+
+msgid "HUD_PETALS_LABEL"
+msgstr "Petals"
+
+msgid "PAUSE_RESUME"
+msgstr "Resume"
+
+msgid "PAUSE_MAP"
+msgstr "Map"
+
+msgid "PAUSE_LORE_ARCHIVE"
+msgstr "Lore Archive"
+
+msgid "PAUSE_OPTIONS"
+msgstr "Options"
+
+msgid "PAUSE_QUIT"
+msgstr "Quit to Menu"
+
+msgid "OPTIONS_LANGUAGE"
+msgstr "Language"
+
+msgid "OPTIONS_SCREEN_SHAKE"
+msgstr "Screen Shake"
+
+msgid "OPTIONS_CONTROLS"
+msgstr "Controls"
+
+msgid "OPTIONS_SFX_VOLUME"
+msgstr "SFX Volume"
+
+msgid "OPTIONS_MUSIC_VOLUME"
+msgstr "Music Volume"
+
+msgid "LORE_ARCHIVE_TITLE"
+msgstr "Lore Archive"
+
+msgid "LORE_ARCHIVE_EMPTY"
+msgstr "No memories recovered yet."
+
+msgid "LORE_ARCHIVE_FRAGMENT"
+msgstr "Memory Fragment"
+
+msgid "ALTAR_PROMPT"
+msgstr "[E] Rest"
+
+msgid "ALTAR_SAVED"
+msgstr "Progress saved."
+
+msgid "ABILITY_DASH"
+msgstr "Spider Lily Dash"
+
+msgid "ABILITY_DASH_DESC"
+msgstr "A short invincible burst forward. Refreshes on landing."
+
+msgid "ABILITY_GROUND_POUND"
+msgstr "Aconite Slam"
+
+msgid "ABILITY_GROUND_POUND_DESC"
+msgstr "Slam downward. Stuns enemies and shatters infected floors."
+
+msgid "ABILITY_DOUBLE_JUMP"
+msgstr "Daisy Ascent"
+
+msgid "ABILITY_DOUBLE_JUMP_DESC"
+msgstr "A second jump wreathed in white petals. Yuri's last gift."
+
+msgid "ABILITY_PHASE_BLINK"
+msgstr "Black Rose Blink"
+
+msgid "ABILITY_PHASE_BLINK_DESC"
+msgstr "Teleport a short distance through thin walls and spore barriers."
+
+msgid "ZONE_1_NAME"
+msgstr "The Iron Barracks"
+
+msgid "ZONE_2_NAME"
+msgstr "The Palace Gardens"
+
+msgid "ZONE_3_NAME"
+msgstr "The Catacombs"
+
+msgid "ZONE_4_NAME"
+msgstr "The Magister's Tower"
+
+msgid "ZONE_5_NAME"
+msgstr "The Bridal Chamber"
+
+msgid "BTN_CONFIRM"
+msgstr "Confirm"
+
+msgid "BTN_BACK"
+msgstr "Back"
+
+msgid "SCRAP_LABEL"
+msgstr "Spores"

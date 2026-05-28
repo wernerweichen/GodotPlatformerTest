@@ -1,0 +1,115 @@
+# 繁體中文 — 鮮血花期
+#
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh\n"
+
+msgid "MENU_PLAY"
+msgstr "開始遊戲"
+
+msgid "MENU_OPTIONS"
+msgstr "設定"
+
+msgid "MENU_QUIT"
+msgstr "離開"
+
+msgid "MENU_TITLE"
+msgstr "鮮血花期"
+
+msgid "HUD_PETALS_LABEL"
+msgstr "花瓣"
+
+msgid "PAUSE_RESUME"
+msgstr "繼續"
+
+msgid "PAUSE_MAP"
+msgstr "地圖"
+
+msgid "PAUSE_LORE_ARCHIVE"
+msgstr "記憶典藏"
+
+msgid "PAUSE_OPTIONS"
+msgstr "設定"
+
+msgid "PAUSE_QUIT"
+msgstr "回到主選單"
+
+msgid "OPTIONS_LANGUAGE"
+msgstr "語言"
+
+msgid "OPTIONS_SCREEN_SHAKE"
+msgstr "畫面震動"
+
+msgid "OPTIONS_CONTROLS"
+msgstr "按鍵配置"
+
+msgid "OPTIONS_SFX_VOLUME"
+msgstr "音效音量"
+
+msgid "OPTIONS_MUSIC_VOLUME"
+msgstr "音樂音量"
+
+msgid "LORE_ARCHIVE_TITLE"
+msgstr "記憶典藏"
+
+msgid "LORE_ARCHIVE_EMPTY"
+msgstr "尚未找回任何記憶。"
+
+msgid "LORE_ARCHIVE_FRAGMENT"
+msgstr "記憶碎片"
+
+msgid "ALTAR_PROMPT"
+msgstr "[E] 休息"
+
+msgid "ALTAR_SAVED"
+msgstr "進度已儲存。"
+
+msgid "ABILITY_DASH"
+msgstr "彼岸花衝刺"
+
+msgid "ABILITY_DASH_DESC"
+msgstr "短暫無敵衝刺。落地後即可再次使用。"
+
+msgid "ABILITY_GROUND_POUND"
+msgstr "烏頭俯衝"
+
+msgid "ABILITY_GROUND_POUND_DESC"
+msgstr "向下猛擊。震暈敵人，擊碎受感染的地板。"
+
+msgid "ABILITY_DOUBLE_JUMP"
+msgstr "雛菊升騰"
+
+msgid "ABILITY_DOUBLE_JUMP_DESC"
+msgstr "白色花瓣環繞的第二段跳躍。由里的最後贈禮。"
+
+msgid "ABILITY_PHASE_BLINK"
+msgstr "黑玫瑰瞬移"
+
+msgid "ABILITY_PHASE_BLINK_DESC"
+msgstr "穿越薄牆或孢子屏障進行短距離瞬移。"
+
+msgid "ZONE_1_NAME"
+msgstr "鐵甲兵營"
+
+msgid "ZONE_2_NAME"
+msgstr "宮廷花園"
+
+msgid "ZONE_3_NAME"
+msgstr "地下墓穴"
+
+msgid "ZONE_4_NAME"
+msgstr "法師之塔"
+
+msgid "ZONE_5_NAME"
+msgstr "新娘密室"
+
+msgid "BTN_CONFIRM"
+msgstr "確認"
+
+msgid "BTN_BACK"
+msgstr "返回"
+
+msgid "SCRAP_LABEL"
+msgstr "孢子晶"

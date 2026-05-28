@@ -1,0 +1,124 @@
+# The Blood Bloom / 鮮血花期 — Translation Template
+# Add new string keys here. Run Godot's localization tools to regenerate .po files.
+#
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# ── Main Menu ──────────────────────────────────────────────────────────────
+msgid "MENU_PLAY"
+msgstr ""
+
+msgid "MENU_OPTIONS"
+msgstr ""
+
+msgid "MENU_QUIT"
+msgstr ""
+
+msgid "MENU_TITLE"
+msgstr ""
+
+# ── HUD ────────────────────────────────────────────────────────────────────
+msgid "HUD_PETALS_LABEL"
+msgstr ""
+
+# ── Pause Menu ─────────────────────────────────────────────────────────────
+msgid "PAUSE_RESUME"
+msgstr ""
+
+msgid "PAUSE_MAP"
+msgstr ""
+
+msgid "PAUSE_LORE_ARCHIVE"
+msgstr ""
+
+msgid "PAUSE_OPTIONS"
+msgstr ""
+
+msgid "PAUSE_QUIT"
+msgstr ""
+
+# ── Options ────────────────────────────────────────────────────────────────
+msgid "OPTIONS_LANGUAGE"
+msgstr ""
+
+msgid "OPTIONS_SCREEN_SHAKE"
+msgstr ""
+
+msgid "OPTIONS_CONTROLS"
+msgstr ""
+
+msgid "OPTIONS_SFX_VOLUME"
+msgstr ""
+
+msgid "OPTIONS_MUSIC_VOLUME"
+msgstr ""
+
+# ── Lore Archive ───────────────────────────────────────────────────────────
+msgid "LORE_ARCHIVE_TITLE"
+msgstr ""
+
+msgid "LORE_ARCHIVE_EMPTY"
+msgstr ""
+
+msgid "LORE_ARCHIVE_FRAGMENT"
+msgstr ""
+
+# ── Silent Altar ───────────────────────────────────────────────────────────
+msgid "ALTAR_PROMPT"
+msgstr ""
+
+msgid "ALTAR_SAVED"
+msgstr ""
+
+# ── Abilities ──────────────────────────────────────────────────────────────
+msgid "ABILITY_DASH"
+msgstr ""
+
+msgid "ABILITY_DASH_DESC"
+msgstr ""
+
+msgid "ABILITY_GROUND_POUND"
+msgstr ""
+
+msgid "ABILITY_GROUND_POUND_DESC"
+msgstr ""
+
+msgid "ABILITY_DOUBLE_JUMP"
+msgstr ""
+
+msgid "ABILITY_DOUBLE_JUMP_DESC"
+msgstr ""
+
+msgid "ABILITY_PHASE_BLINK"
+msgstr ""
+
+msgid "ABILITY_PHASE_BLINK_DESC"
+msgstr ""
+
+# ── Zone Names ─────────────────────────────────────────────────────────────
+msgid "ZONE_1_NAME"
+msgstr ""
+
+msgid "ZONE_2_NAME"
+msgstr ""
+
+msgid "ZONE_3_NAME"
+msgstr ""
+
+msgid "ZONE_4_NAME"
+msgstr ""
+
+msgid "ZONE_5_NAME"
+msgstr ""
+
+# ── System / Generic ───────────────────────────────────────────────────────
+msgid "BTN_CONFIRM"
+msgstr ""
+
+msgid "BTN_BACK"
+msgstr ""
+
+msgid "SCRAP_LABEL"
+msgstr ""

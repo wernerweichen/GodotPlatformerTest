@@ -1,0 +1,4 @@
+# Install GUT (Godot Unit Testing) here via the Godot Asset Library.
+# Search "GUT" in the editor's AssetLib tab, or download from:
+# https://github.com/bitwes/Gut
+# The folder should become: addons/gut/
