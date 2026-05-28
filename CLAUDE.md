@@ -59,7 +59,8 @@ Configure in **Project Settings → Input Map**:
 | `dash` | Shift | B / Circle |
 | `ground_pound` | S (while jumping) | Down + A |
 | `interact` | E, F | Y / Triangle |
-| `pause` | Escape, P | Start |
+| `pause` | Escape, P | Start (Button 6) |
+| `open_inventory` | I | Select (Button 7) |
 
 **Important:**
 - `attack` tap = greatsword slash; `attack` hold = Blood Cost charge
@@ -80,31 +81,33 @@ GodotPlatformerTest/
 │   └── gut/                          # GUT testing framework
 ├── assets/
 │   ├── sprites/
-│   │   ├── player/                   # Gale spritesheets (16×24 base)
-│   │   ├── enemies/                  # 16×16 common, 32×32 large, 64×64 bosses
-│   │   ├── tiles/                    # 16×16 tile PNGs, one folder per zone
-│   │   ├── ui/                       # Heart icons, petal icons, ability icons
-│   │   └── effects/                  # Particle textures, petal FX
-│   ├── tilesets/                     # .tres TileSet resources
+│   │   ├── player/
+│   │   ├── enemies/
+│   │   ├── tiles/
+│   │   ├── ui/
+│   │   └── effects/
+│   ├── tilesets/
 │   ├── audio/
-│   │   ├── music/                    # .ogg zone themes + Elena's leitmotif
-│   │   └── sfx/                      # .wav combat, movement, UI
-│   ├── fonts/                        # .ttf pixel fonts (must include CJK range)
+│   │   ├── music/
+│   │   └── sfx/                      # item_pickup.wav + heal.wav needed here
+│   ├── fonts/
 │   └── localization/
-│       ├── blood_bloom.pot           # Translation template (auto-generated)
-│       ├── en.po                     # English strings
-│       └── zh.po                     # Traditional Chinese strings
+│       ├── blood_bloom.pot
+│       ├── en.po
+│       └── zh.po
+├── resources/
+│   └── items/
+│       └── health_potion.tres        # Pre-configured ItemData (CONSUMABLE, heal, value 1)
 ├── scenes/
 │   ├── player/
-│   │   ├── Player.tscn
-│   │   ├── Player.gd
+│   │   ├── Player.tscn / Player.gd
 │   │   └── abilities/
 │   │       ├── DashAbility.tscn / DashAbility.gd
 │   │       ├── GroundPoundAbility.tscn / GroundPoundAbility.gd
 │   │       ├── DoubleJumpAbility.tscn / DoubleJumpAbility.gd
 │   │       └── PhaseBlinkAbility.tscn / PhaseBlinkAbility.gd
 │   ├── enemies/
-│   │   ├── EnemyBase.gd              # Base class — all enemies extend this
+│   │   ├── EnemyBase.gd
 │   │   ├── InfectedGuard.tscn / InfectedGuard.gd
 │   │   ├── Patroller.tscn / Patroller.gd
 │   │   └── Shooter.tscn / Shooter.gd
@@ -116,8 +119,8 @@ GodotPlatformerTest/
 │   │   └── MotherOrganism.tscn / MotherOrganism.gd
 │   ├── zones/
 │   │   ├── zone_1_barracks/
-│   │   │   ├── Zone1.tscn            # Zone root; rooms are children
-│   │   │   └── rooms/               # Individual room .tscn files
+│   │   │   ├── Zone1.tscn
+│   │   │   └── rooms/
 │   │   ├── zone_2_gardens/
 │   │   ├── zone_3_catacombs/
 │   │   ├── zone_4_tower/
@@ -125,27 +128,28 @@ GodotPlatformerTest/
 │   ├── ui/
 │   │   ├── HUD.tscn / HUD.gd
 │   │   ├── PickupPopup.tscn / PickupPopup.gd   # Pickup notification overlay
+│   │   ├── InventoryUI.tscn / InventoryUI.gd   # In-game inventory panel (layer 15)
 │   │   ├── PauseMenu.tscn / PauseMenu.gd
 │   │   ├── MainMenu.tscn / MainMenu.gd
 │   │   └── LoreArchive.tscn / LoreArchive.gd
 │   └── shared/
-│       ├── SilentAltar.tscn / SilentAltar.gd   # Save point / respawn
-│       ├── BloodPetalFragment.tscn              # Collectible lore item
+│       ├── SilentAltar.tscn / SilentAltar.gd
+│       ├── BloodPetalFragment.tscn
 │       ├── PickupItem.tscn / PickupItem.gd      # Generic world pickup item
 │       ├── Hazard.tscn
 │       └── Camera.tscn / Camera.gd
 ├── scripts/
 │   ├── autoload/
-│   │   ├── GameManager.gd            # Global state, save/load, ending branch logic
-│   │   ├── AudioManager.gd           # play_sfx() / play_music() only interface
-│   │   └── LocalizationManager.gd   # tr() wrapper + language switching
+│   │   ├── GameManager.gd
+│   │   ├── AudioManager.gd
+│   │   └── LocalizationManager.gd
 │   └── resources/
-│       ├── AbilityResource.gd        # Custom Resource for ability data
-│       ├── EnemyStats.gd             # Custom Resource for enemy stat sheets
-│       ├── ItemData.gd               # Custom Resource for pickup item data
-│       └── PetalMemory.gd            # Custom Resource for lore fragments
+│       ├── AbilityResource.gd
+│       ├── EnemyStats.gd
+│       ├── ItemData.gd               # Custom Resource: Type enum + effect_id
+│       └── PetalMemory.gd
 └── tests/
-    ├── test_runner.gd                # GUT test suite entry point
+    ├── test_runner.gd
     ├── test_player_movement.gd
     ├── test_blood_cost.gd
     ├── test_pickup_item.gd
@@ -178,98 +182,101 @@ enum State { IDLE, RUN, JUMP, FALL, WALL_SLIDE, DASH, BLOOD_COST, HURT, DEAD }
 - **Blood Cost** (hold `attack`): see section below
 - All values are `@export` floats
 
-**Abilities** are modular — each is a separate scene/script that Player instantiates and delegates to. Zero ability logic inline in `Player.gd`.
+**Abilities** are modular — each is a separate scene/script that Player instantiates and delegates to.
 
 ### Blood Cost Mechanic
 
 ```gdscript
 @export var blood_cost_charge_frames: int = 30
-@export var blood_cost_hp_fraction: float = 0.25  # fraction of max HP spent
-@export var blood_cost_min_hp: int = 1            # cannot kill Gale
+@export var blood_cost_hp_fraction: float = 0.25
+@export var blood_cost_min_hp: int = 1
 ```
 
 - Hold `attack` → charge timer increments each physics frame
-- At threshold: visual feedback (crimson glow, vine extension, screen pulse)
 - On `attack` release after threshold: spend HP, emit spider lily projectile arc
 - HP floor: `max(current_hp - cost, blood_cost_min_hp)`
-- Damage output scales with actual charge duration
-- Required mechanic to break certain enemy shields and stagger bosses
 
 ### Camera (`scenes/shared/Camera.gd`)
 
 - `Camera2D` with `position_smoothing_enabled = true`
-- Look-ahead: offset in movement direction (`look_ahead_distance` export)
-- Clamp to room boundaries via `limit_left`, `limit_right`, `limit_top`, `limit_bottom`
-- `shake(intensity: float, duration: float)` method — called via signal, never directly
-- Boss fights: camera zooms out to show full arena (lerped transition)
+- Look-ahead in movement direction
+- Clamp to room boundaries
+- `shake(intensity, duration)` via signal
 
 ### Enemy Base Class (`scenes/enemies/EnemyBase.gd`)
 
-All enemies extend this. It handles:
-- Health, taking damage, death (drop scrap, play death anim, `queue_free`)
-- Knockback
-- Hit flash (brief `modulate` colour change)
+- Health, knockback, hit flash, death, scrap drop
 - Signal: `enemy_died(scrap_amount: int)`
-
-**Rules:**
-- **No contact damage** — enemies deal damage only through explicit attack hitboxes
-- All attacks have a ≥8 frame wind-up animation before hitbox activates
+- **No contact damage** — only explicit attack hitboxes
+- All attacks ≥8 frame wind-up
 
 ### Save System (`scripts/autoload/GameManager.gd`)
 
 - `FileAccess` → JSON → `user://save.json`
-- Save only at Silent Altars — never mid-room
-- Saved state: current zone/room ID, unlocked abilities (Array), max health, scrap total, petals collected (Array of IDs), inventory (Array of Dicts)
-- On death: reload last save; scrap from current run is kept (by design)
-- Ending branch check: `petals_collected.size() >= 24` → True Ending; else Bad Ending
+- Save only at Silent Altars
+- Saved state: zone/room, abilities, max health, scrap, petals, inventory
+- On death: reload last save; scrap from run is kept
 
 ### Pickup Item System (`scenes/shared/PickupItem.gd`)
 
 - `Area2D` — collision_layer 32, collision_mask 2 (detects player body)
 - On body_entered with player: calls `GameManager.add_item(item_data)`, plays `item_pickup` SFX, `queue_free()`
-- Hover animation via looping `Tween` (matches `BloodPetalFragment` style)
-- `@export var item_data: ItemData` — assign in Inspector; all tunable values are exports
-- `ItemData` resource: `item_type: String`, `item_name_key: String` (tr() key), `item_value: int`
-- Inventory stored in `GameManager.inventory: Array[Dictionary]` — persisted to save file
-- `GameManager.item_picked_up(item_data)` signal drives `PickupPopup` overlay (fade in → hold 2 s → fade out)
-- `PickupPopup` is instanced as a child of `HUD.tscn`; manages its own signal connection in `_ready()`
-- To place an item in the world: instance `PickupItem.tscn`, set `item_data` in Inspector, done
+- Hover animation via looping `Tween`
+- `@export var item_data: ItemData` — set in Inspector
+
+**ItemData resource** (`scripts/resources/ItemData.gd`):
+```gdscript
+enum Type { CONSUMABLE, KEY_ITEM, UPGRADE, SCRAP }
+@export var item_type: Type = Type.CONSUMABLE
+@export var item_name_key: String = ""   # tr() key
+@export var item_value: int = 0
+@export var effect_id: String = ""       # "heal" | ""
+```
+- `item_type` is an enum — shows as dropdown in Inspector
+- `effect_id` drives `GameManager._apply_effect()` dispatch
+- Stored in `inventory` as `{ type: int, name_key: String, value: int, effect_id: String }`
+
+**Inventory** (`GameManager.inventory: Array[Dictionary]`):
+- Persisted to save file
+- `add_item(ItemData)` → appends entry + emits `item_picked_up`
+- `use_item(slot_index)` → applies effect, removes entry, emits `item_used` (CONSUMABLE only)
+- `_apply_effect("heal", value)` → heals player up to max_health, plays `heal` SFX
+
+**InventoryUI** (`scenes/ui/InventoryUI.gd`):
+- `CanvasLayer` layer=15 (above HUD at 10, below PauseMenu at 20)
+- Toggle with `open_inventory` action (I key / Select); blocks input if tree already paused
+- Pressing `pause` while inventory is open closes inventory instead of opening PauseMenu
+- Lists all items: name, colour-coded type badge, Use button for CONSUMABLEs
+- Rebuilds list on open and after each `item_used` signal
+- Instanced as child of `HUD.tscn` — always available in-game
+
+**Health Potion** (`resources/items/health_potion.tres`):
+- Pre-configured `ItemData`: `item_type=CONSUMABLE`, `item_name_key="ITEM_HEALTH_POTION"`, `item_value=1`, `effect_id="heal"`
+- Assign to a `PickupItem` node's `item_data` in Inspector to place it in the world
 
 ### Localization (`scripts/autoload/LocalizationManager.gd`)
 
-- All display strings use `tr("KEY")` — never hardcode English text in scene labels
-- `.pot` template auto-generated by Godot's localization tools
-- Language stored in save data (default: system locale → English fallback)
-- Switchable from Options menu at runtime without restart
-- CJK (Chinese) font loaded separately to avoid bloating builds that don't need it
+- All display strings use `tr("KEY")` — never hardcode English text
+- Language stored in save data
 
 ### HUD (`scenes/ui/HUD.gd`)
 
 - Listens to signals from `GameManager` and `Player` — **never polls**
-- Health: instantiate spider lily heart icons from `PackedScene`
-- Petal counter: `tr("HUD_PETALS")` label + N/24 count; animates on pickup
-- Ability icon: swaps texture on ability change; dims on cooldown
-- `PickupPopup` child handles its own `item_picked_up` signal — no changes needed in `HUD.gd`
+- `PickupPopup` and `InventoryUI` are instanced children — both self-manage their signals
 
 ### Silent Altar (`scenes/shared/SilentAltar.gd`)
 
 - Interactable when player is in area and presses `interact`
 - Saves game via `GameManager.save_game()`
-- Restores full HP
-- Emits `altar_activated` signal (HUD animates, AudioManager plays chime)
-- Sets `GameManager.respawn_position` and `respawn_zone`
+- Emits `altar_activated` signal
 
 ---
 
 ## Art Rules
 
-- All sprites: pixel art — import filter set to **Nearest** (never Linear or Lanczos)
-- Base resolution: **320×180** — `canvas_items` stretch mode, integer scaling only
-- Placeholder sprites generated via `Image` API — colored rectangles in zone palette, with `Label` overlay
-- All placeholder references in scenes tagged with `# PLACEHOLDER` comment
-- **ComfyUI/SD pipeline:** Drop production `.png` into `assets/sprites/<subfolder>/` — scenes reference fixed paths, no code change required
-- Palette: ≤24 colours per zone (see GDD §9 for per-zone palette specs)
-- Gale's palette (red/white/silver) must be readable in every zone
+- All sprites: pixel art — import filter **Nearest**
+- Base resolution: **320×180** — integer scaling only
+- Palette: ≤24 colours per zone
 
 ---
 
@@ -277,75 +284,56 @@ All enemies extend this. It handles:
 
 - SFX: `.wav`, mono, 44.1 kHz
 - Music: `.ogg`, looping
-- **All audio via `AudioManager` autoload only** — never call `.play()` on an `AudioStreamPlayer` from game logic
-- API: `AudioManager.play_sfx("attack")`, `AudioManager.play_music("zone_1")`
-- Keys are lowercase snake_case strings matching filenames without extension
-- `item_pickup` SFX key expected at `assets/audio/sfx/item_pickup.wav`
+- **All audio via `AudioManager` autoload only**
+- API: `AudioManager.play_sfx("key")`, `AudioManager.play_music("key")`
+- Required SFX keys (drop matching `.wav` into `assets/audio/sfx/`):
+  - `item_pickup` — played when any PickupItem is collected
+  - `heal` — played when a health potion is used
 
 ---
 
 ## Testing Rules
 
 - **GUT** is installed at `addons/gut/`
-- **After every new system or feature:** write or update the matching test file in `tests/`
 - Test filenames: `tests/test_<system>.gd`
-- Run tests headlessly: `godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/`
-- All tests must pass (zero failures) before a feature is marked done
-- Tests cover: input → state transitions, physics edge cases, save/load round-trips, `tr()` key existence
+- Run: `godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/`
+- All tests must pass before a feature is marked done
 
 ---
 
 ## GitHub Pages Deployment
 
-HTML5 export is configured in Godot's export presets as **"HTML5"**.
-
 ```bash
-# 1. Export HTML5 build (run from project root)
 godot --headless --export-release "HTML5" ./web/index.html
-
-# 2. Deploy to gh-pages branch
 git subtree push --prefix web origin gh-pages
 ```
 
-Live URL: `https://wernerweichen.github.io/GodotPlatformerTest/`
-
-**Note:** Enable **Cross-Origin Isolation** in Godot's HTML5 export settings — required for threads in Godot 4.4 web builds.
+Enable **Cross-Origin Isolation** in the HTML5 export preset.
 
 ---
 
 ## Coding Conventions
 
 ```gdscript
-# Exported, typed — all tunable values
 @export var jump_velocity: float = -380.0
-@export var blood_cost_hp_fraction: float = 0.25
 
-# Signals — past-tense verbs, typed parameters
 signal health_changed(new_health: int)
-signal petal_collected(total_collected: int)
-signal enemy_died(scrap_dropped: int)
 
-# State enum at top of file
 enum State { IDLE, RUN, JUMP, FALL, WALL_SLIDE, DASH, BLOOD_COST, HURT, DEAD }
 var state: State = State.IDLE
 
-# Localization — always tr(), never hardcoded strings
 label.text = tr("HUD_PETALS_LABEL")
 
-# No magic numbers
 velocity.y = jump_velocity       # Good
-velocity.y = -380.0              # Bad — use the exported var
+velocity.y = -380.0              # Bad
 
-# No path hacks
 @onready var hud: HUD = $HUD     # Good
 get_node("../../UI/HUD")         # Bad
 ```
 
-- `snake_case` for variables and functions
-- `PascalCase` for classes and node names
-- Every public method gets a one-line doc comment
-- No `get_node("../../")` path strings — use `@onready` or signals
-- No magic number literals inline — always use `@export` vars
+- `snake_case` variables/functions; `PascalCase` classes/nodes
+- No magic number literals — always use `@export` vars
+- No `get_node("../../")` — use `@onready` or signals
 
 ---
 
@@ -359,7 +347,7 @@ get_node("../../UI/HUD")         # Bad
 - [x] Localization skeleton — `.pot`, `en.po`, `zh.po`; `LocalizationManager` autoload
 - [x] `AudioManager` autoload stub
 - [x] `GameManager` autoload — state, save/load, ending branch check
-- [x] Placeholder sprite generator utility (`scripts/utils/PlaceholderSpriteGenerator.gd`)
+- [x] Placeholder sprite generator utility
 - [x] **Player controller** — movement, jump, coyote time, jump buffer, wall slide/jump
 - [x] **Greatsword slash** — 3-hit chain with combo window
 - [x] **Blood Cost mechanic** — charge, HP drain floor at 1, projectile arc
@@ -370,13 +358,13 @@ get_node("../../UI/HUD")         # Bad
 - [x] **Zone 1 room** — `zone1_start.tscn` with platforms, entities, camera wired
 - [x] **Silent Altar** — save/load, respawn position, prompt label
 - [x] **Blood Petal Fragment** — `petal_01` placed in Zone 1, hover animation
-- [x] **Pickup item system** — `ItemData` resource, `PickupItem` world scene, `PickupPopup` HUD overlay, inventory in `GameManager`
-- [x] **HUD** — spider lily hearts (full/empty), petal counter, zone label, ability icon
+- [x] **Pickup item system** — `ItemData` resource with `Type` enum + `effect_id`; `PickupItem` world scene; `PickupPopup` HUD overlay; inventory in `GameManager`; `InventoryUI` panel (I to open); health potion item
+- [x] **HUD** — spider lily hearts, petal counter, zone label, ability icon
 - [x] **Main Menu** — Play transitions to Zone 1
 - [x] **Pause Menu** — pause/resume, Lore Archive panel, Quit to Menu
 - [ ] **GUT test suite** — stubs exist; install GUT via AssetLib to activate
-- [ ] **HTML5 export** — enable Cross-Origin Isolation in export preset (editor step)
-- [ ] **GitHub Pages deploy** — `gh-pages` branch (run after first HTML5 export)
+- [ ] **HTML5 export** — enable Cross-Origin Isolation in export preset
+- [ ] **GitHub Pages deploy** — `gh-pages` branch
 
 ### Post-Vertical-Slice
 
@@ -388,7 +376,7 @@ get_node("../../UI/HUD")         # Bad
 - [ ] All 5 bosses (full fight logic)
 - [ ] All 24 petal fragments + Elena memory lore
 - [ ] Bad ending sequence
-- [ ] True ending sequence (cooperative final sequence)
+- [ ] True ending sequence
 - [ ] Lore Archive (pause menu readable memories)
 - [ ] Full SFX implementation
 - [ ] Full music implementation + Elena's leitmotif
@@ -405,14 +393,13 @@ get_node("../../UI/HUD")         # Bad
 
 Remaining steps require the Godot 4.4 editor:
 
-1. **Open project** in Godot 4.4 — editor will import all assets and regenerate UIDs
-2. **Install GUT** via AssetLib tab (search "GUT") → enables `tests/` to compile
-3. **Add EnemyStats resource** to InfectedGuard and SentinelPrime nodes in Inspector
-4. **Wire placeholder sprites** — `zone1_start.gd` does this at runtime via `PlaceholderSpriteGenerator`
-5. **Place a PickupItem** in Zone 1 — instance `PickupItem.tscn`, assign an `ItemData` resource in Inspector
-6. **Add `item_pickup.wav`** to `assets/audio/sfx/` — AudioManager will load it automatically
-7. **HTML5 export preset** — Project → Export → Add HTML5 preset → enable Cross-Origin Isolation → Export
-8. **GitHub Pages** — push `web/` output to `gh-pages` branch
+1. **Open project** in Godot 4.4 — editor will import assets and regenerate UIDs
+2. **Install GUT** via AssetLib tab (search "GUT")
+3. **Add EnemyStats resource** to InfectedGuard and SentinelPrime in Inspector
+4. **Place a PickupItem** in Zone 1 — instance `PickupItem.tscn`, set `item_data` to `resources/items/health_potion.tres` in Inspector
+5. **Add SFX files:** `assets/audio/sfx/item_pickup.wav` and `assets/audio/sfx/heal.wav`
+6. **HTML5 export preset** — enable Cross-Origin Isolation
+7. **GitHub Pages** — push `web/` output to `gh-pages` branch
 
 Next code milestone: **DashAbility component** (`scenes/player/abilities/DashAbility.gd` + `.tscn`).
 
@@ -427,14 +414,12 @@ Next code milestone: **DashAbility component** (`scenes/player/abilities/DashAbi
 ## Known Constraints & Gotchas
 
 - `TileMapLayer` replaced `TileMap` in Godot 4.3 — never use the old `TileMap` node
-- `move_and_slide()` in Godot 4 does NOT accept velocity as an argument — set `self.velocity` before calling
-- HTML5 export in Godot 4.4 requires **Cross-Origin Isolation** enabled in export settings for thread support
-- Web export requires an HTTP server with correct CORS / `SharedArrayBuffer` headers — test early
-- Integer scaling can cause black bars on non-standard resolutions — test on multiple window sizes
-- GDScript is dynamically typed by default — always add type hints on exports and function signatures
-- CJK (Chinese) text requires a font that includes the full Unicode CJK range — load it separately to avoid inflating the English build's download size
-- Blood Cost HP drain must be floored at 1 — enforce this in code, not just design intent
-- GUT must live in `addons/gut/` — do NOT vendor it inside `scripts/`
-- `AudioManager.play_sfx()` is the only legal way to trigger sound from game logic — no exceptions
-- `PickupItem` calls `AudioManager.play_sfx("item_pickup")` — add `assets/audio/sfx/item_pickup.wav` before testing audio
-- `PickupPopup` manages its own `item_picked_up` signal connection — it does not need to be wired in HUD.gd
+- `move_and_slide()` in Godot 4 does NOT accept velocity as an argument
+- HTML5 export requires **Cross-Origin Isolation** in export settings
+- GDScript is dynamically typed by default — always add type hints on exports and signatures
+- GUT must live in `addons/gut/` — do NOT vendor inside `scripts/`
+- `AudioManager.play_sfx()` is the only legal way to trigger sound — no exceptions
+- `InventoryUI` sets `get_tree().paused = true` when open — it guards against opening when already paused (PauseMenu open), but do not add a third system that also sets `paused`
+- `ItemData.item_type` is now a `Type` enum (int), not a String — stored as int in save JSON; compare with `ItemData.Type.*` constants
+- `heal` SFX required at `assets/audio/sfx/heal.wav` for health potion to play audio
+- `InventoryUI` and `PickupPopup` are both children of `HUD.tscn` and self-connect to `GameManager` signals in their own `_ready()` — `HUD.gd` does not need to reference them

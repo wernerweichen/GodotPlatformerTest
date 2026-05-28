@@ -124,5 +124,28 @@ msgstr "Vial of Ichor"
 msgid "ITEM_IRON_SHARD"
 msgstr "Iron Shard"
 
+msgid "ITEM_HEALTH_POTION"
+msgstr "Crimson Ichor Vial"
+
 msgid "PICKUP_PREFIX"
 msgstr "Found:"
+
+# ── Item Types ─────────────────────────────────────────────────────────────
+msgid "ITEM_TYPE_CONSUMABLE"
+msgstr "Consumable"
+
+msgid "ITEM_TYPE_KEY_ITEM"
+msgstr "Key Item"
+
+msgid "ITEM_TYPE_UPGRADE"
+msgstr "Upgrade"
+
+msgid "ITEM_TYPE_SCRAP"
+msgstr "Scrap"
+
+# ── Inventory UI ───────────────────────────────────────────────────────────
+msgid "INVENTORY_EMPTY"
+msgstr "Nothing in your pack."
+
+msgid "INVENTORY_USE"
+msgstr "Use"
