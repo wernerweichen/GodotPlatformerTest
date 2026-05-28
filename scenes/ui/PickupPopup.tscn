@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://pickuppopup001"]
+
+[ext_resource type="Script" path="res://scenes/ui/PickupPopup.gd" id="1_popup"]
+
+[node name="PickupPopup" type="Control"]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -80.0
+offset_top = -24.0
+offset_right = 80.0
+offset_bottom = -8.0
+script = ExtResource("1_popup")
+
+[node name="Label" type="Label" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 6
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -1,0 +1,47 @@
+[gd_scene load_steps=2 format=3 uid="uid://inventoryui001"]
+
+[ext_resource type="Script" path="res://scenes/ui/InventoryUI.gd" id="1_inv"]
+
+[node name="InventoryUI" type="CanvasLayer"]
+layer = 15
+script = ExtResource("1_inv")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 320.0
+offset_bottom = 180.0
+color = Color(0, 0, 0, 0.75)
+
+[node name="Content" type="VBoxContainer" parent="Background"]
+offset_left = 20.0
+offset_top = 16.0
+offset_right = 300.0
+offset_bottom = 168.0
+theme_override_constants/separation = 4
+
+[node name="TitleBar" type="HBoxContainer" parent="Background/Content"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Background/Content/TitleBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 8
+text = "— INVENTORY —"
+
+[node name="HintLabel" type="Label" parent="Background/Content/TitleBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 6
+text = "[I]"
+
+[node name="EmptyLabel" type="Label" parent="Background/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 6
+text = &"INVENTORY_EMPTY"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Background/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemList" type="VBoxContainer" parent="Background/Content/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
