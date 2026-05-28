@@ -17,7 +17,7 @@ func _ready() -> void:
 	add_to_group("enemies")
 	_current_health = stats.max_health if stats else 3
 	# Register hurtbox group so player attacks can detect us
-	var hurtbox := get_node_or_null("Hurtbox")
+	var hurtbox := get_node_or_null("Hurtbox") as Node
 	if hurtbox:
 		hurtbox.add_to_group("enemy_hurtbox")
 
@@ -58,7 +58,7 @@ func _apply_damage(amount: int, hit_direction: Vector2, _is_blood_cost: bool) ->
 
 func _die() -> void:
 	_is_dead = true
-	var scrap := randi_range(
+	var scrap: int = randi_range(
 		stats.scrap_drop_min if stats else 1,
 		stats.scrap_drop_max if stats else 3
 	)

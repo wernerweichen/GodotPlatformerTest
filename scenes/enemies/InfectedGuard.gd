@@ -43,7 +43,7 @@ func _ai_patrol(delta: float) -> void:
 		_facing = -_facing
 		_traveled = 0.0
 
-	var player := get_tree().get_first_node_in_group("player")
+	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player and _attack_cooldown <= 0.0:
 		if global_position.distance_to(player.global_position) <= attack_range:
 			_ai_state = "wind_up"

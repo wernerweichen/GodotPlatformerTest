@@ -51,9 +51,9 @@ func _ai_patrol(_delta: float) -> void:
 	_sprite.flip_h = _facing < 0.0
 	var offset_x := global_position.x - _patrol_origin.x
 	if absf(offset_x) >= arena_half_width:
-		_facing = -sign(offset_x)
+		_facing = -signf(offset_x)
 
-	var player := get_tree().get_first_node_in_group("player")
+	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player and global_position.distance_to(player.global_position) < 55.0 and _state_timer <= 0.0:
 		_enter_wind_up()
 
@@ -96,9 +96,9 @@ func _enter_shield() -> void:
 
 func _enter_charge() -> void:
 	_ai_state = "charge"
-	var player := get_tree().get_first_node_in_group("player")
+	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player:
-		_facing = sign(player.global_position.x - global_position.x)
+		_facing = signf(player.global_position.x - global_position.x)
 	_state_timer = 1.0
 	AudioManager.play_sfx("boss_charge")
 
