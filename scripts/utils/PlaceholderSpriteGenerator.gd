@@ -45,7 +45,7 @@ static func generate_tile(zone: int) -> ImageTexture:
 static func generate_enemy(size: int = 16) -> ImageTexture:
 	var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
 	img.fill(Color(0.28, 0.28, 0.32))
-	var eye_size := max(2, size / 8)
+	var eye_size: int = maxi(2, size / 8)
 	var eye_y := size / 4
 	_rect(img, Rect2i(size / 4, eye_y, eye_size, eye_size), CRIMSON)
 	_rect(img, Rect2i(size * 3 / 4 - eye_size, eye_y, eye_size, eye_size), CRIMSON)

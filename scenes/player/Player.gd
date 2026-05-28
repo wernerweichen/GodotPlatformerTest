@@ -250,7 +250,7 @@ func take_damage(amount: int, hit_source_position: Vector2 = Vector2.ZERO) -> vo
 	_invincible_timer = invincible_duration
 	_hurt_timer = hurt_duration
 	if hit_source_position != Vector2.ZERO:
-		var kdir := sign(global_position.x - hit_source_position.x)
+		var kdir: float = signf(global_position.x - hit_source_position.x)
 		velocity = Vector2(kdir * knockback_velocity.x, knockback_velocity.y)
 	AudioManager.play_sfx("hurt")
 	if current_health == 0:

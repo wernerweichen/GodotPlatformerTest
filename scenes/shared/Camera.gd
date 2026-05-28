@@ -29,7 +29,7 @@ func shake(intensity: float, duration: float) -> void:
 func _update_look_ahead(delta: float) -> void:
 	if _target == null:
 		return
-	var dir := sign(_target.velocity.x)
+	var dir: float = signf(_target.velocity.x)
 	var target_x := float(dir) * look_ahead_distance
 	offset.x = lerpf(offset.x, target_x, look_ahead_lerp_speed * delta)
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Validates all GDScript files: syntax (gdparse) + lint (gdlint).
-# Optionally runs GUT unit tests if a Godot 4 binary is available.
+# Validates all GDScript files: syntax (gdparse) + lint (gdlint) +
+# Variant-inference check + GUT unit tests (when Godot available).
 # Exit code 0 = all checks passed.
 set -euo pipefail
 
@@ -45,7 +45,44 @@ else
     echo "[validate] gdlint not found — skipping lint (install with: pip3 install gdtoolkit)."
 fi
 
-# --- 3. GUT unit tests (requires Godot 4 binary) ---
+# --- 3. Variant-inference check ---
+# Godot 4 treats "inferred from Variant" as a compile error.
+# These patterns are the most common sources: functions that return Variant
+# when called without an explicit cast or typed destination.
+echo "[validate] Variant-inference check..."
+VARIANT_ERRORS=0
+
+# Functions whose return type is always Variant in Godot 4
+VARIANT_FUNCS="get_node_or_null|get_first_node_in_group|find_child|find_node|get_meta"
+# Polymorphic math builtins that resolve to Variant when arg types are ambiguous
+POLY_MATH="sign\b|max\b|min\b|abs\b|clamp\b"
+
+# Match: var <name> :=  <variant_func>(
+PATTERN=":= *(${VARIANT_FUNCS}|${POLY_MATH})\("
+
+while IFS= read -r -d '' file; do
+    # Exclude lines already resolved via 'as Type' safe cast
+    matches=$(grep -nP "$PATTERN" "$file" 2>/dev/null | grep -v " as " || true)
+    if [ -n "$matches" ]; then
+        echo "  VARIANT INFERENCE in $file:"
+        echo "$matches" | sed 's/^/    /'
+        VARIANT_ERRORS=$((VARIANT_ERRORS + 1))
+    fi
+done < <(printf '%s\0' "${GD_FILES[@]}")
+
+if [ $VARIANT_ERRORS -gt 0 ]; then
+    echo ""
+    echo "[validate] FAILED: $VARIANT_ERRORS file(s) use ':=' with Variant-returning functions."
+    echo "           Use an explicit type annotation or cast:"
+    echo "             var x: float = sign(y)          -- explicit type"
+    echo "             var x := signf(y)                -- typed variant (signf/signi)"
+    echo "             var node := get_node_or_null('N') as Node2D  -- safe cast"
+    echo "             var n: int = maxi(a, b)          -- typed int max"
+    exit 1
+fi
+echo "[validate] Variant-inference OK."
+
+# --- 4. GUT unit tests (requires Godot 4 binary) ---
 GODOT_BIN=""
 for candidate in godot godot4 godot-4 Godot; do
     if command -v "$candidate" &>/dev/null; then
@@ -67,7 +104,7 @@ elif [ -n "$GODOT_BIN" ] && [ ! -d "addons/gut" ]; then
     echo "           Install GUT via AssetLib (search 'GUT') to enable automated testing."
 else
     echo "[validate] Godot binary not found — skipping GUT tests."
-    echo "           Install Godot 4 and add it to PATH to enable automated testing."
+    echo "           Install Godot 4 and add it to PATH to enable full runtime validation."
 fi
 
 echo "[validate] All checks passed."

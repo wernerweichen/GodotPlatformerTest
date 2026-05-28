@@ -24,7 +24,7 @@ func _ready() -> void:
 			sp.texture = PlaceholderSpriteGenerator.generate_enemy(16)
 
 	# Update HUD zone label
-	var hud := get_node_or_null("HUD")
+	var hud := get_node_or_null("HUD") as Node
 	if hud and hud.has_method("set_zone"):
 		hud.set_zone("ZONE_1_NAME")
 
