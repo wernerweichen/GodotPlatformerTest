@@ -122,3 +122,39 @@ msgstr ""
 
 msgid "SCRAP_LABEL"
 msgstr ""
+
+# ── Pickup Items ───────────────────────────────────────────────────────────
+msgid "ITEM_SPORE_CLUSTER"
+msgstr ""
+
+msgid "ITEM_VIAL_OF_ICHOR"
+msgstr ""
+
+msgid "ITEM_IRON_SHARD"
+msgstr ""
+
+msgid "ITEM_HEALTH_POTION"
+msgstr ""
+
+msgid "PICKUP_PREFIX"
+msgstr ""
+
+# ── Item Types ─────────────────────────────────────────────────────────────
+msgid "ITEM_TYPE_CONSUMABLE"
+msgstr ""
+
+msgid "ITEM_TYPE_KEY_ITEM"
+msgstr ""
+
+msgid "ITEM_TYPE_UPGRADE"
+msgstr ""
+
+msgid "ITEM_TYPE_SCRAP"
+msgstr ""
+
+# ── Inventory UI ───────────────────────────────────────────────────────────
+msgid "INVENTORY_EMPTY"
+msgstr ""
+
+msgid "INVENTORY_USE"
+msgstr ""

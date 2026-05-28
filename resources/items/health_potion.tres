@@ -1,0 +1,7 @@
+[gd_resource type="ItemData" load_steps=1 format=3 uid="uid://c1hpot001"]
+
+[resource]
+item_type = 0
+item_name_key = "ITEM_HEALTH_POTION"
+item_value = 1
+effect_id = "heal"

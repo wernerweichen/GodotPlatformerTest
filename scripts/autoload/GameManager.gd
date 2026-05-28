@@ -8,6 +8,8 @@ signal game_loaded
 signal petal_collected(total: int)
 signal scrap_changed(total: int)
 signal health_changed(current: int, maximum: int)
+signal item_picked_up(item_data: ItemData)
+signal item_used(slot_index: int)
 
 var current_zone: int = 1
 var current_room: String = "start"
@@ -20,6 +22,7 @@ var max_health: int = 5
 var current_health: int = 5
 var scrap_total: int = 0
 var petals_collected: Array[String] = []
+var inventory: Array[Dictionary] = []
 
 var _scrap_at_last_save: int = 0
 
@@ -40,6 +43,7 @@ func save_game() -> void:
 		"max_health": max_health,
 		"scrap_total": scrap_total,
 		"petals_collected": petals_collected,
+		"inventory": inventory,
 		"language": LocalizationManager.get_language(),
 	}
 	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
@@ -69,6 +73,7 @@ func load_game() -> void:
 	scrap_total = data.get("scrap_total", 0)
 	_scrap_at_last_save = scrap_total
 	petals_collected = Array(data.get("petals_collected", []), TYPE_STRING, "", null)
+	inventory = Array(data.get("inventory", []), TYPE_DICTIONARY, "", null)
 	var lang: String = data.get("language", "en")
 	LocalizationManager.set_language(lang)
 	game_loaded.emit()
@@ -117,3 +122,32 @@ func upgrade_max_health(amount: int = 1) -> void:
 
 func is_true_ending_unlocked() -> bool:
 	return petals_collected.size() >= TRUE_ENDING_PETAL_COUNT
+
+# Adds an item to the inventory and notifies listeners via item_picked_up signal.
+func add_item(item_data: ItemData) -> void:
+	var entry: Dictionary = {
+		"type": item_data.item_type,
+		"name_key": item_data.item_name_key,
+		"value": item_data.item_value,
+		"effect_id": item_data.effect_id,
+	}
+	inventory.append(entry)
+	item_picked_up.emit(item_data)
+
+# Consumes the CONSUMABLE item at slot_index and removes it from inventory.
+func use_item(slot_index: int) -> void:
+	if slot_index < 0 or slot_index >= inventory.size():
+		return
+	var entry: Dictionary = inventory[slot_index]
+	if entry.get("type") != ItemData.Type.CONSUMABLE:
+		return
+	_apply_effect(entry.get("effect_id", ""), entry.get("value", 0))
+	inventory.remove_at(slot_index)
+	item_used.emit(slot_index)
+
+func _apply_effect(effect_id: String, value: int) -> void:
+	match effect_id:
+		"heal":
+			current_health = mini(current_health + value, max_health)
+			health_changed.emit(current_health, max_health)
+			AudioManager.play_sfx("heal")
