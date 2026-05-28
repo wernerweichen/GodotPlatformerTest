@@ -45,7 +45,7 @@ func _check_phase() -> void:
 			_phase = 2
 			_enter_shield()
 
-func _ai_patrol(delta: float) -> void:
+func _ai_patrol(_delta: float) -> void:
 	var speed := stats.move_speed if stats else 60.0
 	velocity.x = _facing * speed
 	_sprite.flip_h = _facing < 0.0

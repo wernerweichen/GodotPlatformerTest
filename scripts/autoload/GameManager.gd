@@ -87,7 +87,7 @@ func take_damage(amount: int) -> void:
 
 # Respawn at last altar; scrap earned during the run is intentionally kept.
 func on_player_died() -> void:
-	var run_scrap := max(0, scrap_total - _scrap_at_last_save)
+	var run_scrap: int = max(0, scrap_total - _scrap_at_last_save)
 	load_game()
 	scrap_total += run_scrap
 	scrap_changed.emit(scrap_total)
