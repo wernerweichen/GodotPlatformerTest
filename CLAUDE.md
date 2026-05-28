@@ -292,12 +292,44 @@ enum Type { CONSUMABLE, KEY_ITEM, UPGRADE, SCRAP }
 
 ---
 
-## Testing Rules
+## Testing & Validation Rules
 
-- **GUT** is installed at `addons/gut/`
+### Pre-commit / pre-push hooks
+
+Every commit and push runs `scripts/validate.sh` automatically via git hooks installed at `.git/hooks/pre-commit` and `.git/hooks/pre-push`.
+
+**After cloning the repo, install the hooks once:**
+```bash
+bash scripts/install_hooks.sh
+```
+
+**To run checks manually at any time:**
+```bash
+bash scripts/validate.sh
+```
+
+The script runs three checks in order:
+
+| Step | Tool | When available |
+|---|---|---|
+| 1. Syntax check | `gdparse` (gdtoolkit) | Always — install with `pip3 install gdtoolkit` |
+| 2. Lint check | `gdlint` (gdtoolkit) | Always — same package |
+| 3. GUT unit tests | `godot --headless` | Only when Godot 4 binary is in PATH **and** `addons/gut/` exists |
+
+Lint is configured via `gdlintrc` at the project root (max line length 120; `class-definitions-order` disabled to match existing codebase style).
+
+### GUT unit tests
+
+- **GUT** must be installed at `addons/gut/` — install via Godot AssetLib
 - Test filenames: `tests/test_<system>.gd`
-- Run: `godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/`
+- Run manually: `godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/ -gexit`
 - All tests must pass before a feature is marked done
+
+### GDScript conventions enforced by lint
+
+- Unused function arguments must be prefixed with `_` (e.g. `_delta`) to suppress warnings
+- All variables inferred with `:=` must not be typed as `Variant` — use explicit types instead (`var x: int = ...`)
+- Line length limit is 120 characters
 
 ---
 
@@ -362,7 +394,8 @@ get_node("../../UI/HUD")         # Bad
 - [x] **HUD** — spider lily hearts, petal counter, zone label, ability icon
 - [x] **Main Menu** — Play transitions to Zone 1
 - [x] **Pause Menu** — pause/resume, Lore Archive panel, Quit to Menu
-- [ ] **GUT test suite** — stubs exist; install GUT via AssetLib to activate
+- [x] **Pre-commit/pre-push validation** — `scripts/validate.sh` (gdparse + gdlint); hooks installed; `gdlintrc` configured
+- [ ] **GUT test suite** — stubs exist; install GUT via AssetLib and run `bash scripts/install_hooks.sh` to activate
 - [ ] **HTML5 export** — enable Cross-Origin Isolation in export preset
 - [ ] **GitHub Pages deploy** — `gh-pages` branch
 
@@ -407,7 +440,7 @@ Next code milestone: **DashAbility component** (`scenes/player/abilities/DashAbi
 
 ## Known Issues
 
-*(none)*
+*(none — parser error `run_scrap` Variant inference fixed in GameManager.gd:90; `_delta` renamed in SentinelPrime.gd:48)*
 
 ---
 
