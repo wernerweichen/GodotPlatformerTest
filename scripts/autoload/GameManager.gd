@@ -9,6 +9,7 @@ signal petal_collected(total: int)
 signal scrap_changed(total: int)
 signal health_changed(current: int, maximum: int)
 signal item_picked_up(item_data: ItemData)
+signal item_used(slot_index: int)
 
 var current_zone: int = 1
 var current_room: String = "start"
@@ -128,6 +129,25 @@ func add_item(item_data: ItemData) -> void:
 		"type": item_data.item_type,
 		"name_key": item_data.item_name_key,
 		"value": item_data.item_value,
+		"effect_id": item_data.effect_id,
 	}
 	inventory.append(entry)
 	item_picked_up.emit(item_data)
+
+# Consumes the CONSUMABLE item at slot_index and removes it from inventory.
+func use_item(slot_index: int) -> void:
+	if slot_index < 0 or slot_index >= inventory.size():
+		return
+	var entry: Dictionary = inventory[slot_index]
+	if entry.get("type") != ItemData.Type.CONSUMABLE:
+		return
+	_apply_effect(entry.get("effect_id", ""), entry.get("value", 0))
+	inventory.remove_at(slot_index)
+	item_used.emit(slot_index)
+
+func _apply_effect(effect_id: String, value: int) -> void:
+	match effect_id:
+		"heal":
+			current_health = mini(current_health + value, max_health)
+			health_changed.emit(current_health, max_health)
+			AudioManager.play_sfx("heal")
