@@ -12,7 +12,9 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_just_pressed("pause"):
+	if not event.is_action_type():
+		return
+	if event.is_action_pressed("pause") and not event.is_echo():
 		if visible:
 			_close()
 			get_viewport().set_input_as_handled()
