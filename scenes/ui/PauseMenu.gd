@@ -11,13 +11,14 @@ func _ready() -> void:
 	# Must process while tree is paused so player can unpause
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if event.is_action_just_pressed("pause"):
 		if visible:
 			_close()
-		else:
+			get_viewport().set_input_as_handled()
+		elif not get_tree().paused:
 			_open()
-		get_viewport().set_input_as_handled()
+			get_viewport().set_input_as_handled()
 
 func _open() -> void:
 	show()
