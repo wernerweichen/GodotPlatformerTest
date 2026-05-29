@@ -1,17 +1,24 @@
-[gd_scene load_steps=7 format=3 uid="uid://player001"]
+[gd_scene load_steps=8 format=3 uid="uid://player001"]
 
 [ext_resource type="Script" path="res://scenes/player/Player.gd" id="1_player"]
 [ext_resource type="PackedScene" path="res://scenes/shared/SpiderLilyProjectile.tscn" id="2_proj"]
 [ext_resource type="PackedScene" path="res://scenes/shared/AimIndicator.tscn" id="3_aimind"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
-size = Vector2(14, 22)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
+radius = 4.0
+height = 16.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurt"]
+size = Vector2(12, 20)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_atk"]
 size = Vector2(22, 12)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurt"]
-size = Vector2(12, 20)
+[sub_resource type="Script" id="Script_hurtbox"]
+source_code = "extends Area2D
+
+signal hit_received(damage: int, knockback_direction: Vector2)
+"
 
 [node name="Player" type="CharacterBody2D"]
 collision_layer = 2
@@ -22,7 +29,8 @@ blood_cost_projectile_scene = ExtResource("2_proj")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_body")
+position = Vector2(0, 4)
+shape = SubResource("CapsuleShape2D_body")
 
 [node name="WallLeft" type="RayCast2D" parent="."]
 target_position = Vector2(-9, 0)
@@ -46,8 +54,10 @@ disabled = true
 [node name="Hurtbox" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 16
+script = SubResource("Script_hurtbox")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, 2)
 shape = SubResource("RectangleShape2D_hurt")
 
 [node name="AbilityContainer" type="Node2D" parent="."]

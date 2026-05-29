@@ -503,7 +503,7 @@ Connect `InputController.skill_aimed` in `DashAbility._ready()` and filter on `s
 
 ## Known Issues
 
-*(none — parser error `run_scrap` Variant inference fixed in GameManager.gd:90; `_delta` renamed in SentinelPrime.gd:48)*
+Collision upgraded: precise capsule + hurtbox separation + drop-through + slope step-up (see Player.gd)
 
 ---
 

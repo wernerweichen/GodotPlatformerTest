@@ -12,15 +12,21 @@ enum State { IDLE, RUN, JUMP, FALL, WALL_SLIDE, DASH, BLOOD_COST, HURT, DEAD }
 @export var acceleration: float = 800.0
 @export var friction: float = 1200.0
 
+# ── Collision ─────────────────────────────────────────────────────────────
+@export var floor_snap_len: float = 4.0
+@export var floor_max_angle_deg: float = 46.0
+@export var step_height: float = 4.0
+
 # ── Jump ──────────────────────────────────────────────────────────────────
 @export var jump_velocity: float = -360.0
 @export var jump_cut_velocity: float = -120.0
 @export var coyote_frames: int = 6
 @export var jump_buffer_frames: int = 8
 
-# ── Wall ──────────────────────────────────────────────────────────────────
+# ── Wall / Drop ───────────────────────────────────────────────────────────
 @export var wall_slide_gravity: float = 80.0
 @export var wall_jump_velocity: Vector2 = Vector2(200.0, -300.0)
+@export var drop_through_buffer_frames: int = 6
 
 # ── Combat ────────────────────────────────────────────────────────────────
 @export var max_health: int = 5
@@ -37,6 +43,9 @@ enum State { IDLE, RUN, JUMP, FALL, WALL_SLIDE, DASH, BLOOD_COST, HURT, DEAD }
 @export var blood_cost_hp_fraction: float = 0.25
 @export var blood_cost_projectile_count: int = 5
 @export var blood_cost_projectile_scene: PackedScene
+
+# Physics layer bit index for one-way platforms (must match TileMapLayer assignment)
+const PLATFORM_LAYER: int = 2
 
 @onready var _sprite: Sprite2D = $Sprite2D
 @onready var _attack_hitbox: Area2D = $AttackHitbox
@@ -63,6 +72,7 @@ var _blood_cost_charging: bool = false
 
 var _hurt_timer: float = 0.0
 var _invincible_timer: float = 0.0
+var _drop_through_timer: int = 0
 
 func _ready() -> void:
 	add_to_group("player")
@@ -72,17 +82,24 @@ func _ready() -> void:
 	GameManager.health_changed.connect(_on_gm_health_changed)
 	InputController.register_player(self)
 	InputController.facing_changed.connect(_on_ic_facing_changed)
+	motion_mode = MOTION_MODE_GROUNDED
+	floor_block_on_wall = false
+	floor_snap_length = floor_snap_len
+	floor_max_angle = deg_to_rad(floor_max_angle_deg)
+	wall_min_slide_angle = deg_to_rad(15.0)
 
 func _physics_process(delta: float) -> void:
 	if state == State.DEAD:
 		return
 	_tick(delta)
-	_update_coyote()
 	_handle_jump(delta)
 	_handle_attack()
+	_try_drop_through()
 	_handle_movement(delta)
 	_apply_gravity(delta)
+	_step_up_assist()
 	move_and_slide()
+	_update_coyote()
 	_update_state()
 	_update_visuals()
 
@@ -97,16 +114,36 @@ func _tick(delta: float) -> void:
 		_slash_active_frames -= 1
 		if _slash_active_frames == 0:
 			_attack_shape.disabled = true
+	if _drop_through_timer > 0:
+		_drop_through_timer -= 1
+		if _drop_through_timer == 0:
+			set_collision_mask_value(PLATFORM_LAYER, true)
 
 func _update_coyote() -> void:
 	if is_on_floor():
 		_coyote_remaining = coyote_frames
-		_was_on_floor = true
 		_is_jumping = false
 	elif _was_on_floor and not _is_jumping:
 		_coyote_remaining -= 1
-		if _coyote_remaining <= 0:
-			_was_on_floor = false
+	_was_on_floor = is_on_floor()
+
+func _try_drop_through() -> void:
+	if Input.is_action_pressed("move_down") and Input.is_action_just_pressed("jump"):
+		set_collision_mask_value(PLATFORM_LAYER, false)
+		_drop_through_timer = drop_through_buffer_frames
+
+func _step_up_assist() -> void:
+	if not is_on_floor() or not _is_valid_wall():
+		return
+	var dir: float = Input.get_axis("move_left", "move_right")
+	if dir == 0.0:
+		return
+	if not test_move(transform, Vector2(0.0, -step_height)):
+		position.y -= step_height
+
+func _is_valid_wall() -> bool:
+	var normal: Vector2 = get_wall_normal()
+	return is_on_wall() and absf(normal.dot(Vector2.UP)) < 0.3
 
 func _handle_jump(_delta: float) -> void:
 	if Input.is_action_just_pressed("jump"):
@@ -117,15 +154,13 @@ func _handle_jump(_delta: float) -> void:
 	if _jump_buffer_remaining > 0 and (_coyote_remaining > 0 or is_on_floor()):
 		_do_jump()
 
-	# Variable height — cut velocity on early release
 	if Input.is_action_just_released("jump") and _is_jumping and velocity.y < jump_cut_velocity:
 		velocity.y = jump_cut_velocity
 
-	# Wall jump
 	if not is_on_floor() and Input.is_action_just_pressed("jump"):
-		if _wall_left.is_colliding():
+		if _wall_left.is_colliding() and _is_valid_wall():
 			_do_wall_jump(1.0)
-		elif _wall_right.is_colliding():
+		elif _wall_right.is_colliding() and _is_valid_wall():
 			_do_wall_jump(-1.0)
 
 func _do_jump() -> void:
@@ -169,13 +204,12 @@ func _do_slash() -> void:
 	_combo_window_remaining = combo_window_frames
 	_slash_active_frames = slash_hitbox_active_frames
 	_attack_shape.disabled = false
-	# Offset hitbox left or right based on facing
 	_attack_hitbox.position.x = _facing * 12.0
 	AudioManager.play_sfx("slash")
 
 func _do_blood_cost() -> void:
 	_sprite.modulate = Color.WHITE
-	var cost := maxi(1, int(float(current_health) * blood_cost_hp_fraction))
+	var cost: int = maxi(1, int(float(current_health) * blood_cost_hp_fraction))
 	current_health = maxi(1, current_health - cost)
 	GameManager.current_health = current_health
 	GameManager.health_changed.emit(current_health, GameManager.max_health)
@@ -185,11 +219,11 @@ func _do_blood_cost() -> void:
 func _spawn_blood_cost_projectiles() -> void:
 	if blood_cost_projectile_scene == null:
 		return
-	var spread := PI / 3.0
-	for i in blood_cost_projectile_count:
-		var t := float(i) / float(maxi(blood_cost_projectile_count - 1, 1))
-		var angle := -spread * 0.5 + t * spread
-		var base_dir := Vector2(_facing, -0.15).normalized()
+	var spread: float = PI / 3.0
+	for i: int in blood_cost_projectile_count:
+		var t: float = float(i) / float(maxi(blood_cost_projectile_count - 1, 1))
+		var angle: float = -spread * 0.5 + t * spread
+		var base_dir: Vector2 = Vector2(_facing, -0.15).normalized()
 		var proj: Node = blood_cost_projectile_scene.instantiate()
 		get_tree().current_scene.add_child(proj)
 		proj.global_position = global_position + Vector2(_facing * 8.0, -4.0)
@@ -199,9 +233,9 @@ func _spawn_blood_cost_projectiles() -> void:
 func _handle_movement(delta: float) -> void:
 	if _hurt_timer > 0.0:
 		return
-	var dir := Input.get_axis("move_left", "move_right")
+	var dir: float = Input.get_axis("move_left", "move_right")
 	if dir != 0.0:
-		_facing = sign(dir)
+		_facing = signf(dir)
 		InputController.set_movement_facing(_facing)
 		velocity.x = move_toward(velocity.x, dir * move_speed, acceleration * delta)
 	else:
@@ -210,9 +244,9 @@ func _handle_movement(delta: float) -> void:
 func _apply_gravity(delta: float) -> void:
 	if is_on_floor():
 		return
-	var wall_dir := Input.get_axis("move_left", "move_right")
-	var wall_sliding := (_wall_left.is_colliding() and wall_dir < 0.0) or \
-						(_wall_right.is_colliding() and wall_dir > 0.0)
+	var wall_dir: float = Input.get_axis("move_left", "move_right")
+	var wall_sliding: bool = _is_valid_wall() and \
+		((_wall_left.is_colliding() and wall_dir < 0.0) or (_wall_right.is_colliding() and wall_dir > 0.0))
 	if wall_sliding and velocity.y > 0.0:
 		velocity.y = move_toward(velocity.y, 60.0, wall_slide_gravity * delta)
 	else:
@@ -225,8 +259,8 @@ func _update_state() -> void:
 	if _blood_cost_charging:
 		state = State.BLOOD_COST
 		return
-	var wall_dir := Input.get_axis("move_left", "move_right")
-	var wall_sliding := not is_on_floor() and \
+	var wall_dir: float = Input.get_axis("move_left", "move_right")
+	var wall_sliding: bool = not is_on_floor() and _is_valid_wall() and \
 		((_wall_left.is_colliding() and wall_dir < 0.0) or (_wall_right.is_colliding() and wall_dir > 0.0))
 	if is_on_floor():
 		state = State.RUN if absf(velocity.x) > 5.0 else State.IDLE
@@ -244,7 +278,6 @@ func _update_visuals() -> void:
 	elif not _blood_cost_charging:
 		_sprite.modulate = Color.WHITE
 
-# Called by enemy attack hitboxes and hazards.
 func take_damage(amount: int, hit_source_position: Vector2 = Vector2.ZERO) -> void:
 	if _invincible_timer > 0.0 or state == State.DEAD:
 		return
@@ -269,13 +302,12 @@ func _die() -> void:
 
 func _on_attack_area_entered(area: Area2D) -> void:
 	if area.is_in_group("enemy_hurtbox"):
-		var enemy := area.get_parent()
+		var enemy: Node = area.get_parent()
 		if enemy.has_method("take_damage"):
 			enemy.take_damage(1, global_position.direction_to(enemy.global_position))
 
 func _on_gm_health_changed(current: int, _max: int) -> void:
 	current_health = current
 
-# Updates local _facing when InputController flips it (e.g. during mouse aim).
 func _on_ic_facing_changed(new_facing: float) -> void:
 	_facing = new_facing
