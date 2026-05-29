@@ -61,10 +61,15 @@ Configure in **Project Settings → Input Map**:
 | `interact` | E, F | Y / Triangle |
 | `pause` | Escape, P | Start (Button 6) |
 | `open_inventory` | I | Select (Button 7) |
+| `skill_1` | Q | LB (Button 9) |
+| `skill_2` | R | RB (Button 10) |
+| `skill_3` | T | — |
+| `aim_confirm` | Mouse Left Click | — |
+| `aim_cancel` | Mouse Right Click | — |
 
 **Important:**
 - `attack` tap = greatsword slash; `attack` hold = Blood Cost charge
-- Mouse is reserved for future systems — do NOT bind game actions to mouse buttons
+- `skill_1/2/3` enter aim mode; confirm with left click OR key release; cancel with right click or Escape
 - All inputs via `Input.is_action_*()` — never hardcode key scancodes
 - Controls must be fully remappable from the Options menu
 
@@ -136,13 +141,15 @@ GodotPlatformerTest/
 │       ├── SilentAltar.tscn / SilentAltar.gd
 │       ├── BloodPetalFragment.tscn
 │       ├── PickupItem.tscn / PickupItem.gd      # Generic world pickup item
+│       ├── AimIndicator.tscn / AimIndicator.gd  # Visual aim overlay (child of Player)
 │       ├── Hazard.tscn
 │       └── Camera.tscn / Camera.gd
 ├── scripts/
 │   ├── autoload/
 │   │   ├── GameManager.gd
 │   │   ├── AudioManager.gd
-│   │   └── LocalizationManager.gd
+│   │   ├── LocalizationManager.gd
+│   │   └── InputController.gd        # Dual-input manager: facing + skill aim mode
 │   └── resources/
 │       ├── AbilityResource.gd
 │       ├── EnemyStats.gd
@@ -154,12 +161,66 @@ GodotPlatformerTest/
     ├── test_blood_cost.gd
     ├── test_pickup_item.gd
     ├── test_save_system.gd
-    └── test_localization.gd
+    ├── test_localization.gd
+    └── test_input_controller.gd
 ```
 
 ---
 
 ## Core Systems — Implementation Notes
+
+### InputController (`scripts/autoload/InputController.gd`)
+
+Autoload that owns the canonical facing direction and all aim-mode state.
+Other systems (abilities, AimIndicator, HUD) hook in via signals — they never touch Player directly.
+
+**Public state (read-only):**
+```gdscript
+var is_aiming: bool          # true while a skill key is held / aim mode active
+var current_skill_id: String # "skill_1" | "skill_2" | "skill_3" | ""
+var facing: float            # +1.0 right, -1.0 left
+var aim_direction: Vector2   # normalised world direction toward mouse cursor
+```
+
+**Signals:**
+| Signal | Args | When emitted |
+|---|---|---|
+| `facing_changed` | `new_facing: float` | Facing flips (movement or mouse aim) |
+| `aim_mode_entered` | `skill_id: String` | Skill key pressed, aim mode starts |
+| `aim_mode_exited` | — | Aim mode ends (confirmed or cancelled) |
+| `skill_aimed` | `skill_id: String, world_direction: Vector2` | Aim confirmed; ability systems fire on this |
+
+**API:**
+```gdscript
+InputController.register_player(player: CharacterBody2D)  # call from Player._ready()
+InputController.set_movement_facing(dir: float)           # call from Player._handle_movement()
+```
+
+**Priority rule:** during aim mode, mouse controls `facing`; `set_movement_facing()` is ignored.
+
+**Aim mode flow:**
+1. Press `skill_1/2/3` → `aim_mode_entered` emitted
+2. Move mouse to aim direction
+3. Release key OR left click → `aim_mode_exited` then `skill_aimed` emitted
+4. Right click or Escape → `aim_mode_exited` only (no `skill_aimed`)
+
+### AimIndicator (`scenes/shared/AimIndicator.tscn` / `AimIndicator.gd`)
+
+`Node2D` child of Player; draws the visual aim overlay in `_draw()` using Godot canvas calls.
+Subscribes to `InputController.aim_mode_entered/exited` — no coupling to Player.
+
+```gdscript
+@export var style: Style           # LINE | CONE | CIRCLE
+@export var line_length: float
+@export var cone_half_angle_deg: float
+@export var cone_radius: float
+@export var circle_radius: float
+@export var indicator_color: Color
+@export var line_width: float
+```
+
+Change `style` per skill by having ability scenes swap the exported value, or by connecting
+`aim_mode_entered` and branching on `skill_id`.
 
 ### Player Controller (`scenes/player/Player.gd`)
 
@@ -395,6 +456,7 @@ get_node("../../UI/HUD")         # Bad
 - [x] **Main Menu** — Play transitions to Zone 1
 - [x] **Pause Menu** — pause/resume, Lore Archive panel, Quit to Menu
 - [x] **Pre-commit/pre-push validation** — `scripts/validate.sh` (gdparse + gdlint); hooks installed; `gdlintrc` configured
+- [x] **Dual-input control system** — `InputController` autoload; keyboard moves + aims facing; skill keys (Q/R/T) enter mouse-aim mode; `AimIndicator` visual overlay; signals for loose coupling
 - [ ] **GUT test suite** — stubs exist; install GUT via AssetLib and run `bash scripts/install_hooks.sh` to activate
 - [ ] **HTML5 export** — enable Cross-Origin Isolation in export preset
 - [ ] **GitHub Pages deploy** — `gh-pages` branch
@@ -422,7 +484,7 @@ get_node("../../UI/HUD")         # Bad
 
 ## Current Task
 
-**Vertical Slice is feature-complete in code.**
+**Dual-input control system is complete in code.** Vertical Slice is feature-complete.
 
 Remaining steps require the Godot 4.4 editor:
 
@@ -435,6 +497,7 @@ Remaining steps require the Godot 4.4 editor:
 7. **GitHub Pages** — push `web/` output to `gh-pages` branch
 
 Next code milestone: **DashAbility component** (`scenes/player/abilities/DashAbility.gd` + `.tscn`).
+Connect `InputController.skill_aimed` in `DashAbility._ready()` and filter on `skill_id == "skill_1"`.
 
 ---
 
@@ -456,3 +519,6 @@ Next code milestone: **DashAbility component** (`scenes/player/abilities/DashAbi
 - `ItemData.item_type` is now a `Type` enum (int), not a String — stored as int in save JSON; compare with `ItemData.Type.*` constants
 - `heal` SFX required at `assets/audio/sfx/heal.wav` for health potion to play audio
 - `InventoryUI` and `PickupPopup` are both children of `HUD.tscn` and self-connect to `GameManager` signals in their own `_ready()` — `HUD.gd` does not need to reference them
+- `InputController` is a fourth autoload (explicit exception approved by this task); it calls `set_input_as_handled()` on aim-cancel Escape to prevent PauseMenu from also receiving it
+- `AimIndicator` connects to `InputController` in its own `_ready()` — Player.gd does not reference AimIndicator directly
+- Ability scenes should connect to `InputController.skill_aimed` and filter by `skill_id`; do not hardcode which key fires each ability
