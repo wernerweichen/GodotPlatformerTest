@@ -12,6 +12,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 func _input(event: InputEvent) -> void:
+	if not event.is_action_type():
+		return
 	if event.is_action_just_pressed("pause"):
 		if visible:
 			_close()

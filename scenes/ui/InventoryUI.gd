@@ -10,6 +10,8 @@ func _ready() -> void:
 	GameManager.item_used.connect(_on_item_used)
 
 func _input(event: InputEvent) -> void:
+	if not event.is_action_type():
+		return
 	if event.is_action_just_pressed("open_inventory"):
 		if visible:
 			_close()
