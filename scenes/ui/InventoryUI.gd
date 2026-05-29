@@ -12,13 +12,13 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if not event.is_action_type():
 		return
-	if event.is_action_just_pressed("open_inventory"):
+	if event.is_action_pressed("open_inventory") and not event.is_echo():
 		if visible:
 			_close()
 		elif not get_tree().paused:
 			_open()
 		get_viewport().set_input_as_handled()
-	elif event.is_action_just_pressed("pause") and visible:
+	elif event.is_action_pressed("pause") and not event.is_echo() and visible:
 		_close()
 		get_viewport().set_input_as_handled()
 
