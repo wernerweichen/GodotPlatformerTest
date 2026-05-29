@@ -70,6 +70,8 @@ func _ready() -> void:
 	_attack_shape.disabled = true
 	_attack_hitbox.area_entered.connect(_on_attack_area_entered)
 	GameManager.health_changed.connect(_on_gm_health_changed)
+	InputController.register_player(self)
+	InputController.facing_changed.connect(_on_ic_facing_changed)
 
 func _physics_process(delta: float) -> void:
 	if state == State.DEAD:
@@ -138,6 +140,7 @@ func _do_wall_jump(dir: float) -> void:
 	velocity = Vector2(wall_jump_velocity.x * dir, wall_jump_velocity.y)
 	_is_jumping = true
 	_facing = dir
+	InputController.set_movement_facing(dir)
 	AudioManager.play_sfx("jump")
 
 func _handle_attack() -> void:
@@ -199,6 +202,7 @@ func _handle_movement(delta: float) -> void:
 	var dir := Input.get_axis("move_left", "move_right")
 	if dir != 0.0:
 		_facing = sign(dir)
+		InputController.set_movement_facing(_facing)
 		velocity.x = move_toward(velocity.x, dir * move_speed, acceleration * delta)
 	else:
 		velocity.x = move_toward(velocity.x, 0.0, friction * delta)
@@ -271,3 +275,7 @@ func _on_attack_area_entered(area: Area2D) -> void:
 
 func _on_gm_health_changed(current: int, _max: int) -> void:
 	current_health = current
+
+# Updates local _facing when InputController flips it (e.g. during mouse aim).
+func _on_ic_facing_changed(new_facing: float) -> void:
+	_facing = new_facing

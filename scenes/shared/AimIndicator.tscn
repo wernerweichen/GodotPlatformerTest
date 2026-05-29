@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://aimindicator01"]
+
+[ext_resource type="Script" path="res://scenes/shared/AimIndicator.gd" id="1_aimindicator"]
+
+[node name="AimIndicator" type="Node2D"]
+script = ExtResource("1_aimindicator")
